@@ -80,6 +80,21 @@ export const OutputSummary: React.FC = () => {
                             <strong>Authenticity: </strong> {a.authenticityNotes}
                           </div>
                         )}
+                        {a.rationale && (
+                          <div className="text-small mt-xs">
+                            <strong>Rationale: </strong> {a.rationale}
+                          </div>
+                        )}
+                        {a.risksOrConcerns && (
+                          <div className="text-small mt-xs">
+                            <strong>Risks: </strong> {a.risksOrConcerns}
+                          </div>
+                        )}
+                        {a.assumptions && (
+                          <div className="text-small mt-xs">
+                            <strong>Assumptions: </strong> {a.assumptions}
+                          </div>
+                        )}
                       </td>
                       <td style={{ verticalAlign: 'top' }}>
                         <span className="badge">{a.type || 'Undefined'}</span>
@@ -131,6 +146,18 @@ export const OutputSummary: React.FC = () => {
               <strong className="text-small text-muted" style={{ textTransform: 'uppercase' }}>Risks or Concerns</strong>
               <p>{rationale.risksOrConcerns || <span className="text-muted italic">Not specified</span>}</p>
             </div>
+            {rationale.aiInvolvement && (
+              <div>
+                <strong className="text-small text-muted" style={{ textTransform: 'uppercase' }}>AI Involvement (Overall)</strong>
+                <p>{rationale.aiInvolvement}</p>
+              </div>
+            )}
+            {rationale.assumptions && (
+              <div>
+                <strong className="text-small text-muted" style={{ textTransform: 'uppercase' }}>Assumptions</strong>
+                <p>{rationale.assumptions}</p>
+              </div>
+            )}
           </div>
         </div>
 

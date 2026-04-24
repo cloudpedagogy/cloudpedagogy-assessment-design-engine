@@ -25,6 +25,9 @@ export interface Assessment {
   authenticityNotes: string;
   feedbackApproach?: string;
   submissionMode?: string;
+  rationale?: string;
+  risksOrConcerns?: string;
+  assumptions?: string;
 }
 
 export interface AssessmentPlanMeta {
@@ -37,6 +40,8 @@ export interface Rationale {
   designRationale: string;
   authenticityConsiderations: string;
   risksOrConcerns: string;
+  aiInvolvement?: string;
+  assumptions?: string;
 }
 
 export interface AppState {

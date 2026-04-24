@@ -135,7 +135,7 @@ export const AssessmentDesignPanel: React.FC = () => {
                 />
               </div>
 
-              <div className="form-group mb-0">
+              <div className="form-group">
                 <label>Authenticity Notes</label>
                 <input 
                   type="text"
@@ -143,6 +143,36 @@ export const AssessmentDesignPanel: React.FC = () => {
                   onChange={e => updateAssessment(assessment.id, { authenticityNotes: e.target.value })}
                   placeholder="How is this task authentic? (e.g., 'Simulates a real-world client report')"
                 />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="text-small">Rationale</label>
+                  <textarea 
+                    value={assessment.rationale || ''}
+                    onChange={e => updateAssessment(assessment.id, { rationale: e.target.value })}
+                    placeholder="Specific reasoning for this task..."
+                    style={{ minHeight: '60px', fontSize: '0.875rem' }}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="text-small">Risks / Concerns</label>
+                  <textarea 
+                    value={assessment.risksOrConcerns || ''}
+                    onChange={e => updateAssessment(assessment.id, { risksOrConcerns: e.target.value })}
+                    placeholder="Integrity or delivery risks..."
+                    style={{ minHeight: '60px', fontSize: '0.875rem' }}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="text-small">Assumptions</label>
+                  <textarea 
+                    value={assessment.assumptions || ''}
+                    onChange={e => updateAssessment(assessment.id, { assumptions: e.target.value })}
+                    placeholder="Key assumptions (optional)..."
+                    style={{ minHeight: '60px', fontSize: '0.875rem' }}
+                  />
+                </div>
               </div>
             </div>
           ))}

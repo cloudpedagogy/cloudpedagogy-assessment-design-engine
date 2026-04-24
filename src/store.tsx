@@ -13,7 +13,9 @@ const emptyState: AppState = {
   rationale: {
     designRationale: '',
     authenticityConsiderations: '',
-    risksOrConcerns: ''
+    risksOrConcerns: '',
+    aiInvolvement: '',
+    assumptions: ''
   },
   lastUpdated: new Date().toISOString()
 };
@@ -155,7 +157,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       aiUsageDescription: '',
       authenticityNotes: '',
       feedbackApproach: '',
-      submissionMode: ''
+      submissionMode: '',
+      rationale: '',
+      risksOrConcerns: '',
+      assumptions: ''
     };
     updateState({ assessments: [...state.assessments, newAssessment] });
   };
