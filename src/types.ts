@@ -42,6 +42,7 @@ export interface Rationale {
   risksOrConcerns: string;
   aiInvolvement?: string;
   assumptions?: string;
+  capabilityNotes?: string;
 }
 
 export interface AppState {

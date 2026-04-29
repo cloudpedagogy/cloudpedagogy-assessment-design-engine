@@ -67,3 +67,12 @@ Its distinctive value lies in the **explicit mapping of learning outcomes to AI 
 - The "Upstream/Downstream" connections are inferred from the ecosystem description in `README.md`.
 - The specific mapping to "Phase 4" is explicitly stated in the `README.md`.
 - Data structure names are taken directly from `src/types.ts`.
+
+## 16. Capability and Governance Alignment
+
+This tool is aligned with the CloudPedagogy Capability and Governance standard.
+
+- Capability: The tool supports development of practical AI capability through structured interaction and workflow use.
+- Governance: The tool includes lightweight, optional fields that make assumptions, risks, and decisions visible and reviewable.
+
+This alignment ensures the tool supports both effective use of AI and responsible, accountable practice.

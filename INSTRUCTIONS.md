@@ -75,3 +75,22 @@ This tool provides a structured environment for defining assessment tasks, mappi
 - **Weighting Check:** Keep an eye on the "Total Weighting" indicator; it will turn green when the sum of all assessments reaches exactly 100%.
 - **Local Persistence:** Your work is saved automatically to your browser's local storage. You can safely close the tab and return later.
 - **Demo Data:** Use the "Load Demo Data" button in the header to see an example of a completed assessment plan.
+
+---
+
+### 11. Capability & Governance
+
+**What this tool does:** This tool provides a structured environment for defining assessment tasks, mapping them to learning outcomes, and explicitly documenting AI usage policies.
+
+**How capability is developed:** By systematically designing assessments with explicit AI boundaries, users develop their ability to critically evaluate authenticity and structure AI-aware learning designs.
+
+**How governance is supported:** The Rationale panel includes an optional Capability & Governance section. This allows you to document the context of your work directly within the tool.
+
+**Explanation of Optional Fields:**
+- **Capability Notes:** An optional field to document what capability this supports, suggested AI use patterns, human judgement checkpoints, reflection prompts, and next capability steps.
+- **AI Involvement:** Detail if/how AI was used in creating or reviewing the assessment design.
+- **Assumptions:** Note any underlying assumptions made during the design process.
+- **Risks or concerns:** Highlight any potential issues (e.g., academic integrity risks, bias).
+- **Rationale:** Justify the structural choices and AI usage modes assigned.
+
+These fields will automatically be appended to your exported Assessment Summary if filled out.

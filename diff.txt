@@ -1,0 +1,121 @@
+diff --git a/INSTRUCTIONS.md b/INSTRUCTIONS.md
+index da8bd5e..98d36b8 100644
+--- a/INSTRUCTIONS.md
++++ b/INSTRUCTIONS.md
+@@ -75,3 +75,22 @@ This tool provides a structured environment for defining assessment tasks, mappi
+ - **Weighting Check:** Keep an eye on the "Total Weighting" indicator; it will turn green when the sum of all assessments reaches exactly 100%.
+ - **Local Persistence:** Your work is saved automatically to your browser's local storage. You can safely close the tab and return later.
+ - **Demo Data:** Use the "Load Demo Data" button in the header to see an example of a completed assessment plan.
++
++---
++
++### 11. Capability & Governance
++
++**What this tool does:** This tool provides a structured environment for defining assessment tasks, mapping them to learning outcomes, and explicitly documenting AI usage policies.
++
++**How capability is developed:** By systematically designing assessments with explicit AI boundaries, users develop their ability to critically evaluate authenticity and structure AI-aware learning designs.
++
++**How governance is supported:** The Rationale panel includes an optional Capability & Governance section. This allows you to document the context of your work directly within the tool.
++
++**Explanation of Optional Fields:**
++- **Capability Notes:** An optional field to document what capability this supports, suggested AI use patterns, human judgement checkpoints, reflection prompts, and next capability steps.
++- **AI Involvement:** Detail if/how AI was used in creating or reviewing the assessment design.
++- **Assumptions:** Note any underlying assumptions made during the design process.
++- **Risks or concerns:** Highlight any potential issues (e.g., academic integrity risks, bias).
++- **Rationale:** Justify the structural choices and AI usage modes assigned.
++
++These fields will automatically be appended to your exported Assessment Summary if filled out.
+diff --git a/PROJECT_SPEC.md b/PROJECT_SPEC.md
+index bd29c63..bfa6f5d 100644
+--- a/PROJECT_SPEC.md
++++ b/PROJECT_SPEC.md
+@@ -67,3 +67,12 @@ Its distinctive value lies in the **explicit mapping of learning outcomes to AI
+ - The "Upstream/Downstream" connections are inferred from the ecosystem description in `README.md`.
+ - The specific mapping to "Phase 4" is explicitly stated in the `README.md`.
+ - Data structure names are taken directly from `src/types.ts`.
++
++## 16. Capability and Governance Alignment
++
++This tool is aligned with the CloudPedagogy Capability and Governance standard.
++
++- Capability: The tool supports development of practical AI capability through structured interaction and workflow use.
++- Governance: The tool includes lightweight, optional fields that make assumptions, risks, and decisions visible and reviewable.
++
++This alignment ensures the tool supports both effective use of AI and responsible, accountable practice.
+diff --git a/README.md b/README.md
+index ea9e471..145e736 100644
+--- a/README.md
++++ b/README.md
+@@ -119,3 +119,14 @@ CloudPedagogy develops open, governance-credible tools for building confident, r
+ 
+ - Website: https://www.cloudpedagogy.com/  
+ - Framework: https://github.com/cloudpedagogy/cloudpedagogy-ai-capability-framework  
++
++---
++
++## Capability and Governance
++
++This tool supports both AI capability development and lightweight governance.
++
++- Capability is developed through structured interaction with real workflows
++- Governance is supported through optional fields that make assumptions, risks, and decisions visible
++
++All governance inputs are optional and designed to support — not constrain — professional judgement.
+diff --git a/src/components/OutputSummary.tsx b/src/components/OutputSummary.tsx
+index 279ffcc..1dca2cf 100644
+--- a/src/components/OutputSummary.tsx
++++ b/src/components/OutputSummary.tsx
+@@ -158,6 +158,12 @@ export const OutputSummary: React.FC = () => {
+                 <p>{rationale.assumptions}</p>
+               </div>
+             )}
++            {rationale.capabilityNotes && (
++              <div>
++                <strong className="text-small text-muted" style={{ textTransform: 'uppercase' }}>Capability & Governance Notes</strong>
++                <p style={{ whiteSpace: 'pre-wrap' }}>{rationale.capabilityNotes}</p>
++              </div>
++            )}
+           </div>
+         </div>
+ 
+diff --git a/src/components/RationalePanel.tsx b/src/components/RationalePanel.tsx
+index 0d47a6d..f7176e6 100644
+--- a/src/components/RationalePanel.tsx
++++ b/src/components/RationalePanel.tsx
+@@ -57,6 +57,24 @@ export const RationalePanel: React.FC = () => {
+           style={{ minHeight: '60px' }}
+         />
+       </div>
++
++      {/* Lightweight capability and governance layer */}
++      {/* Optional, non-blocking, and does not alter core workflow */}
++      <details style={{ marginTop: 'var(--spacing-lg)', borderTop: '1px solid var(--color-border-default)', paddingTop: 'var(--spacing-md)' }}>
++        <summary style={{ cursor: 'pointer', fontWeight: 500, fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
++          Capability & Governance Notes (Optional)
++        </summary>
++        <div className="form-group mt-md mb-0">
++          <label style={{ fontSize: '0.85rem' }}>Capability Notes</label>
++          <textarea 
++            className="text-small"
++            value={rationale.capabilityNotes || ''}
++            onChange={e => updateRationale({ capabilityNotes: e.target.value })}
++            placeholder="Consider: What capability this supports, Suggested AI use pattern, Human judgement checkpoint, Reflection prompt, Next capability step..."
++            style={{ minHeight: '100px', backgroundColor: '#f8fafc', borderColor: '#cbd5e1' }}
++          />
++        </div>
++      </details>
+     </div>
+   );
+ };
+diff --git a/src/types.ts b/src/types.ts
+index adcc6fb..c69e27d 100644
+--- a/src/types.ts
++++ b/src/types.ts
+@@ -42,6 +42,7 @@ export interface Rationale {
+   risksOrConcerns: string;
+   aiInvolvement?: string;
+   assumptions?: string;
++  capabilityNotes?: string;
+ }
+ 
+ export interface AppState {

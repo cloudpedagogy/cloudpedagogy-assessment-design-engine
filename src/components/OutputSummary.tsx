@@ -158,6 +158,12 @@ export const OutputSummary: React.FC = () => {
                 <p>{rationale.assumptions}</p>
               </div>
             )}
+            {rationale.capabilityNotes && (
+              <div>
+                <strong className="text-small text-muted" style={{ textTransform: 'uppercase' }}>Capability & Governance Notes</strong>
+                <p style={{ whiteSpace: 'pre-wrap' }}>{rationale.capabilityNotes}</p>
+              </div>
+            )}
           </div>
         </div>
 

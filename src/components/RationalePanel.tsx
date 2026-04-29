@@ -57,6 +57,24 @@ export const RationalePanel: React.FC = () => {
           style={{ minHeight: '60px' }}
         />
       </div>
+
+      {/* Lightweight capability and governance layer */}
+      {/* Optional, non-blocking, and does not alter core workflow */}
+      <details style={{ marginTop: 'var(--spacing-lg)', borderTop: '1px solid var(--color-border-default)', paddingTop: 'var(--spacing-md)' }}>
+        <summary style={{ cursor: 'pointer', fontWeight: 500, fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
+          Capability & Governance Notes (Optional)
+        </summary>
+        <div className="form-group mt-md mb-0">
+          <label style={{ fontSize: '0.85rem' }}>Capability Notes</label>
+          <textarea 
+            className="text-small"
+            value={rationale.capabilityNotes || ''}
+            onChange={e => updateRationale({ capabilityNotes: e.target.value })}
+            placeholder="Consider: What capability this supports, Suggested AI use pattern, Human judgement checkpoint, Reflection prompt, Next capability step..."
+            style={{ minHeight: '100px', backgroundColor: '#f8fafc', borderColor: '#cbd5e1' }}
+          />
+        </div>
+      </details>
     </div>
   );
 };
