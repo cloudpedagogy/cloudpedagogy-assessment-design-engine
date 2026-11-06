@@ -71,24 +71,47 @@ This helps ensure assessment remains valid, meaningful, and defensible in an AI-
 
 ## Technical Overview
 
-- Built with TypeScript + Vite (React)  
-- Fully local-first — runs entirely in the browser  
-- Uses localStorage for persistence  
-- Supports JSON import/export  
-- No backend or external data storage  
+- Built with TypeScript + React + Vite
+- Fully local-first — runs entirely in the browser
+- Uses `localStorage` (`cloudpedagogy_assessment_engine`) with non-destructive corrupted data recovery
+- Supports portable, schema-validated JSON import and Blob-based export
+- Configured with relative asset resolution (`base: './'`) for seamless web and desktop Studio embedding
+- No backend or external data storage required
 
 ---
 
-## Run Locally
+## Development and Verification
 
-npm install  
-npm run dev  
+### Run Locally
+```bash
+npm install
+npm run dev
+```
+
+### Run Tests
+```bash
+npm test          # Run full Vitest regression suite
+npm run test:watch # Run tests in watch mode
+```
+
+### Linting
+```bash
+npm run lint
+```
+
+### Production Build
+```bash
+npm run build
+```
+Builds production-ready assets to `dist/` with relative asset links (`./assets/...`), allowing the application to be served from any subdirectory, static web host (such as AWS S3), or embedded locally in desktop containers (such as Assessment & Integrity Studio).
 
 ---
 
-## Build
+## Data Persistence and Recovery
 
-npm run build  
+- **Active Session:** Stored in `localStorage` under key `cloudpedagogy_assessment_engine`.
+- **Non-Destructive Recovery:** If stored data is corrupted or uninterpretable, the application initializes safely in memory and preserves the raw corrupted string under `cloudpedagogy_assessment_engine_corrupted_backup`. Stored data is never silently overwritten on mount without deliberate user actions.
+- **Import/Export:** Full plans can be exported to JSON via Blob downloads and restored using the Import button with runtime structural validation. Existing historical plans remain backward-compatible.
 
 ---
 

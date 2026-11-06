@@ -23,8 +23,8 @@ export const OutputSummary: React.FC = () => {
     <div className="cp-card printable-summary" style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}>
       <div className="cp-card-header cp-hide-print">
         <h2 className="cp-card-title">Assessment Summary Output</h2>
-        <button className="cp-button-primary" onClick={() => window.print()}>
-          <Download size={16} /> Print / Save to PDF
+        <button type="button" className="cp-button-primary" onClick={() => window.print()} aria-label="Print or save assessment plan as PDF">
+          <Download size={16} aria-hidden="true" /> Print / Save to PDF
         </button>
       </div>
 

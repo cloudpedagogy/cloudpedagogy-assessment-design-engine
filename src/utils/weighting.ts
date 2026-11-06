@@ -59,3 +59,4 @@ export function formatWeighting(val: number): string {
   const rounded = Number(val.toFixed(2));
   return rounded.toString();
 }
+

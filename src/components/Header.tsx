@@ -48,11 +48,11 @@ export const Header: React.FC = () => {
         </div>
         
         <div className="flex items-center gap-sm">
-          <button className="cp-button-secondary" onClick={loadDemoData} title="Load Demo Example">
-            <BookOpen size={16} /> Load Demo
+          <button type="button" className="cp-button-secondary" onClick={loadDemoData} title="Load Demo Example" aria-label="Load Demo Example">
+            <BookOpen size={16} aria-hidden="true" /> Load Demo
           </button>
-          <button className="cp-button-secondary" onClick={handleImportClick} title="Import JSON">
-            <Upload size={16} /> Import
+          <button type="button" className="cp-button-secondary" onClick={handleImportClick} title="Import JSON" aria-label="Import Assessment Plan from JSON">
+            <Upload size={16} aria-hidden="true" /> Import
           </button>
           <input 
             type="file" 
@@ -60,12 +60,13 @@ export const Header: React.FC = () => {
             ref={fileInputRef} 
             onChange={handleFileChange} 
             style={{ display: 'none' }} 
+            aria-label="Upload JSON configuration file"
           />
-          <button className="cp-button-secondary" onClick={exportJSON} title="Export JSON">
-            <Download size={16} /> Export
+          <button type="button" className="cp-button-secondary" onClick={exportJSON} title="Export JSON" aria-label="Export Assessment Plan to JSON">
+            <Download size={16} aria-hidden="true" /> Export
           </button>
-          <button className="cp-button-danger" onClick={resetState} title="Clear Workspace">
-            <Trash2 size={16} /> Clear
+          <button type="button" className="cp-button-danger" onClick={resetState} title="Clear Workspace" aria-label="Clear Entire Workspace">
+            <Trash2 size={16} aria-hidden="true" /> Clear
           </button>
         </div>
       </div>
