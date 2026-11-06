@@ -1,5 +1,6 @@
 import React from 'react';
 import { StoreProvider } from './store';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { Header } from './components/Header';
 import { PlanMetaPanel } from './components/PlanMetaPanel';
 import { LearningOutcomesPanel } from './components/LearningOutcomesPanel';
@@ -38,9 +39,11 @@ const AppContent: React.FC = () => {
 
 function App() {
   return (
-    <StoreProvider>
-      <AppContent />
-    </StoreProvider>
+    <ErrorBoundary>
+      <StoreProvider>
+        <AppContent />
+      </StoreProvider>
+    </ErrorBoundary>
   );
 }
 

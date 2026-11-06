@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { useStore } from '../store';
 import { Download, Upload, Trash2, BookOpen } from 'lucide-react';
-import type { AppState } from '../types';
+import { validateImportJSON } from '../utils/validation';
 
 export const Header: React.FC = () => {
   const { exportJSON, importJSON, resetState, loadDemoData } = useStore();
@@ -18,15 +18,16 @@ export const Header: React.FC = () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        const json = JSON.parse(event.target?.result as string) as AppState;
-        // Simple validation check
-        if (json && typeof json === 'object' && 'assessments' in json) {
-          importJSON(json);
+        const text = event.target?.result as string;
+        const json = JSON.parse(text);
+        const result = validateImportJSON(json);
+        if (result.success) {
+          importJSON(result.data);
         } else {
-          alert('Invalid file format. Please select a valid Assessment Engine JSON export.');
+          alert(`Invalid file format: ${result.error}\n\nYour current assessment design was preserved.`);
         }
-      } catch (err) {
-        alert('Failed to parse JSON file.');
+      } catch {
+        alert('Failed to parse JSON file: The selected file is not valid JSON.\n\nYour current assessment design was preserved.');
       }
       if (fileInputRef.current) {
         fileInputRef.current.value = '';

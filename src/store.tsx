@@ -1,26 +1,14 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import type { AppState, LearningOutcome, Assessment, AssessmentPlanMeta, Rationale } from './types';
 import { v4 as uuidv4 } from 'uuid';
+import { emptyState, normalizeState } from './utils/validation';
 
-const emptyState: AppState = {
-  meta: {
-    programmeName: '',
-    moduleName: '',
-    level: ''
-  },
-  learningOutcomes: [],
-  assessments: [],
-  rationale: {
-    designRationale: '',
-    authenticityConsiderations: '',
-    risksOrConcerns: '',
-    aiInvolvement: '',
-    assumptions: ''
-  },
-  lastUpdated: new Date().toISOString()
-};
+export const STORAGE_KEY = 'cloudpedagogy_assessment_engine';
+export const STORAGE_BACKUP_KEY = 'cloudpedagogy_assessment_engine_corrupted_backup';
 
-const demoState: AppState = {
+export { emptyState };
+
+export const demoState: AppState = {
   meta: {
     programmeName: "Master of Public Health",
     moduleName: "Health Policy Analysis",
@@ -79,7 +67,7 @@ const demoState: AppState = {
   lastUpdated: new Date().toISOString()
 };
 
-interface StoreContextType {
+export interface StoreContextType {
   state: AppState;
   updateMeta: (meta: AssessmentPlanMeta) => void;
   addLearningOutcome: (outcome: Omit<LearningOutcome, 'id'>) => void;
@@ -98,23 +86,66 @@ interface StoreContextType {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const isDirtyRef = useRef<boolean>(false);
+
   const [state, setState] = useState<AppState>(() => {
-    const saved = localStorage.getItem('cloudpedagogy_assessment_engine');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error("Failed to parse local state", e);
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        let parsed: unknown;
+        try {
+          parsed = JSON.parse(saved);
+        } catch (e) {
+          console.warn("Storage contains invalid JSON; preserving raw data non-destructively", e);
+          try {
+            localStorage.setItem(STORAGE_BACKUP_KEY, saved);
+          } catch {
+            // Ignore storage quota errors
+          }
+          return emptyState;
+        }
+
+        if (typeof parsed === 'object' && parsed !== null) {
+          return normalizeState(parsed);
+        } else {
+          console.warn("Storage contains non-object payload; preserving raw data non-destructively");
+          try {
+            localStorage.setItem(STORAGE_BACKUP_KEY, saved);
+          } catch {
+            // Ignore storage quota errors
+          }
+          return emptyState;
+        }
       }
+    } catch (e) {
+      console.error("Failed to read from localStorage", e);
     }
     return emptyState;
   });
 
   useEffect(() => {
-    localStorage.setItem('cloudpedagogy_assessment_engine', JSON.stringify(state));
+    // Non-destructive safeguard: if storage held unparseable data and user hasn't made mutations,
+    // avoid silently overwriting the original raw data on mount.
+    try {
+      const existing = localStorage.getItem(STORAGE_KEY);
+      if (existing && !isDirtyRef.current) {
+        try {
+          const parsed = JSON.parse(existing);
+          if (typeof parsed !== 'object' || parsed === null) {
+            return;
+          }
+        } catch {
+          return;
+        }
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+      console.error("Failed to write to localStorage", e);
+    }
   }, [state]);
 
   const updateState = (updates: Partial<AppState>) => {
+    isDirtyRef.current = true;
     setState(prev => ({ ...prev, ...updates, lastUpdated: new Date().toISOString() }));
   };
 
@@ -191,16 +222,19 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const importJSON = (data: AppState) => {
-    setState(data);
+    isDirtyRef.current = true;
+    setState(normalizeState(data));
   };
 
   const resetState = () => {
     if (confirm("Are you sure you want to completely clear the workspace? This cannot be undone.")) {
+      isDirtyRef.current = true;
       setState(emptyState);
     }
   };
 
   const loadDemoData = () => {
+    isDirtyRef.current = true;
     setState({ ...demoState, lastUpdated: new Date().toISOString() });
   };
 
