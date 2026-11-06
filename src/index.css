@@ -258,9 +258,20 @@ textarea {
   .cp-hide-print {
     display: none !important;
   }
+  .max-width-container {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
   .cp-card {
     box-shadow: none;
-    border: 1px solid #000;
-    page-break-inside: avoid;
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+  .printable-summary {
+    border: none !important;
+    background-color: transparent !important;
+    padding: 0 !important;
   }
 }

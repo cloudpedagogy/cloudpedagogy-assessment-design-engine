@@ -2,6 +2,7 @@ import React from 'react';
 import { useStore } from '../store';
 import type { AssessmentType, AIUsageMode } from '../types';
 import { Plus, Trash2, AlertTriangle, CheckCircle } from 'lucide-react';
+import { calculateTotalWeighting, isTotalWeightingValid, formatWeighting, sanitizeWeightInput } from '../utils/weighting';
 
 const ASSESSMENT_TYPES: AssessmentType[] = [
   "Essay", "Report", "Presentation", "Project", "Portfolio", 
@@ -13,8 +14,8 @@ export const AssessmentDesignPanel: React.FC = () => {
   const { state, addAssessment, updateAssessment, removeAssessment } = useStore();
   const { assessments, learningOutcomes } = state;
 
-  const totalWeighting = assessments.reduce((sum, a) => sum + (Number(a.weighting) || 0), 0);
-  const isWeightingValid = totalWeighting === 100;
+  const totalWeighting = calculateTotalWeighting(assessments);
+  const isWeightingValid = isTotalWeightingValid(totalWeighting);
 
   return (
     <div className="cp-card">
@@ -23,7 +24,7 @@ export const AssessmentDesignPanel: React.FC = () => {
         <div className="flex items-center gap-md">
           <div className={`flex items-center gap-xs \${isWeightingValid ? 'text-success' : 'text-danger'}`} style={{ color: isWeightingValid ? 'var(--color-success)' : 'var(--color-danger)' }}>
             {isWeightingValid ? <CheckCircle size={18} /> : <AlertTriangle size={18} />}
-            <span className="semibold">Total Weighting: {totalWeighting}%</span>
+            <span className="semibold">Total Weighting: {formatWeighting(totalWeighting)}%</span>
           </div>
           <button className="cp-button-primary" onClick={addAssessment}>
             <Plus size={16} /> Add Assessment
@@ -69,9 +70,11 @@ export const AssessmentDesignPanel: React.FC = () => {
                   <label>Weighting (%)</label>
                   <input 
                     type="number" 
-                    min="0" max="100"
+                    min="0" 
+                    max="100"
+                    step="any"
                     value={assessment.weighting === 0 && assessment.title === 'New Assessment' ? '' : assessment.weighting}
-                    onChange={e => updateAssessment(assessment.id, { weighting: Number(e.target.value) })}
+                    onChange={e => updateAssessment(assessment.id, { weighting: sanitizeWeightInput(e.target.value) })}
                   />
                 </div>
               </div>

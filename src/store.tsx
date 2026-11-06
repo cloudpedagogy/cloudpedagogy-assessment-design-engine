@@ -88,6 +88,18 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isDirtyRef = useRef<boolean>(false);
 
+  const saveCorruptedBackup = (rawCorrupted: string) => {
+    try {
+      // Ensure repeated recovery attempts cannot overwrite/destroy the original backup
+      const existingBackup = localStorage.getItem(STORAGE_BACKUP_KEY);
+      if (!existingBackup && rawCorrupted) {
+        localStorage.setItem(STORAGE_BACKUP_KEY, rawCorrupted);
+      }
+    } catch {
+      // Ignore storage quota errors
+    }
+  };
+
   const [state, setState] = useState<AppState>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -97,11 +109,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           parsed = JSON.parse(saved);
         } catch (e) {
           console.warn("Storage contains invalid JSON; preserving raw data non-destructively", e);
-          try {
-            localStorage.setItem(STORAGE_BACKUP_KEY, saved);
-          } catch {
-            // Ignore storage quota errors
-          }
+          saveCorruptedBackup(saved);
           return emptyState;
         }
 
@@ -109,11 +117,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           return normalizeState(parsed);
         } else {
           console.warn("Storage contains non-object payload; preserving raw data non-destructively");
-          try {
-            localStorage.setItem(STORAGE_BACKUP_KEY, saved);
-          } catch {
-            // Ignore storage quota errors
-          }
+          saveCorruptedBackup(saved);
           return emptyState;
         }
       }
@@ -144,36 +148,38 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [state]);
 
-  const updateState = (updates: Partial<AppState>) => {
+  const updateState = (updater: Partial<AppState> | ((prev: AppState) => Partial<AppState>)) => {
     isDirtyRef.current = true;
-    setState(prev => ({ ...prev, ...updates, lastUpdated: new Date().toISOString() }));
+    setState(prev => {
+      const updates = typeof updater === 'function' ? updater(prev) : updater;
+      return { ...prev, ...updates, lastUpdated: new Date().toISOString() };
+    });
   };
 
   const updateMeta = (meta: AssessmentPlanMeta) => {
-    updateState({ meta: { ...state.meta, ...meta } });
+    updateState(prev => ({ meta: { ...prev.meta, ...meta } }));
   };
 
   const addLearningOutcome = (outcome: Omit<LearningOutcome, 'id'>) => {
     const newOutcome = { ...outcome, id: uuidv4() };
-    updateState({ learningOutcomes: [...state.learningOutcomes, newOutcome] });
+    updateState(prev => ({ learningOutcomes: [...prev.learningOutcomes, newOutcome] }));
   };
 
   const updateLearningOutcome = (id: string, outcomeUpdate: Partial<LearningOutcome>) => {
-    updateState({
-      learningOutcomes: state.learningOutcomes.map(o => o.id === id ? { ...o, ...outcomeUpdate } : o)
-    });
+    updateState(prev => ({
+      learningOutcomes: prev.learningOutcomes.map(o => o.id === id ? { ...o, ...outcomeUpdate } : o)
+    }));
   };
 
   const removeLearningOutcome = (id: string) => {
     // Also remove reference from assessments
-    const newAssessments = state.assessments.map(a => ({
-      ...a,
-      linkedOutcomeIds: a.linkedOutcomeIds.filter(lid => lid !== id)
+    updateState(prev => ({
+      learningOutcomes: prev.learningOutcomes.filter(o => o.id !== id),
+      assessments: prev.assessments.map(a => ({
+        ...a,
+        linkedOutcomeIds: Array.isArray(a.linkedOutcomeIds) ? a.linkedOutcomeIds.filter(lid => lid !== id) : []
+      }))
     }));
-    updateState({
-      learningOutcomes: state.learningOutcomes.filter(o => o.id !== id),
-      assessments: newAssessments
-    });
   };
 
   const addAssessment = () => {
@@ -193,32 +199,37 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       risksOrConcerns: '',
       assumptions: ''
     };
-    updateState({ assessments: [...state.assessments, newAssessment] });
+    updateState(prev => ({ assessments: [...prev.assessments, newAssessment] }));
   };
 
   const updateAssessment = (id: string, update: Partial<Assessment>) => {
-    updateState({
-      assessments: state.assessments.map(a => a.id === id ? { ...a, ...update } : a)
-    });
+    updateState(prev => ({
+      assessments: prev.assessments.map(a => a.id === id ? { ...a, ...update } : a)
+    }));
   };
 
   const removeAssessment = (id: string) => {
-    updateState({ assessments: state.assessments.filter(a => a.id !== id) });
+    updateState(prev => ({ assessments: prev.assessments.filter(a => a.id !== id) }));
   };
 
   const updateRationale = (rationaleUpdate: Partial<Rationale>) => {
-    updateState({ rationale: { ...state.rationale, ...rationaleUpdate } });
+    updateState(prev => ({ rationale: { ...prev.rationale, ...rationaleUpdate } }));
   };
 
   const exportJSON = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+    const jsonString = JSON.stringify(state, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
     const dt = new Date();
     const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", `assessment_design_${dt.getTime()}.json`);
+    downloadAnchorNode.setAttribute('href', url);
+    downloadAnchorNode.setAttribute('download', `assessment_design_${dt.getTime()}.json`);
     document.body.appendChild(downloadAnchorNode);
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 1000);
   };
 
   const importJSON = (data: AppState) => {

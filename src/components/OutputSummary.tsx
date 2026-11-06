@@ -1,12 +1,13 @@
 import React from 'react';
 import { useStore } from '../store';
 import { Download } from 'lucide-react';
+import { calculateTotalWeighting, formatWeighting } from '../utils/weighting';
 
 export const OutputSummary: React.FC = () => {
   const { state } = useStore();
   const { meta, learningOutcomes, assessments, rationale } = state;
 
-  const totalWeighting = assessments.reduce((sum, a) => sum + (Number(a.weighting) || 0), 0);
+  const totalWeighting = calculateTotalWeighting(assessments);
 
   const getLOMap = () => {
     const map: Record<string, string> = {};
@@ -19,8 +20,8 @@ export const OutputSummary: React.FC = () => {
   const loMap = getLOMap();
 
   return (
-    <div className="cp-card cp-hide-print" style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}>
-      <div className="cp-card-header">
+    <div className="cp-card printable-summary" style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+      <div className="cp-card-header cp-hide-print">
         <h2 className="cp-card-title">Assessment Summary Output</h2>
         <button className="cp-button-primary" onClick={() => window.print()}>
           <Download size={16} /> Print / Save to PDF
@@ -54,7 +55,7 @@ export const OutputSummary: React.FC = () => {
         </div>
 
         <div className="mb-lg">
-          <h3 style={{ borderBottom: '1px solid var(--color-border-default)', paddingBottom: '8px' }}>Assessment Design Structure ({totalWeighting}% Total)</h3>
+          <h3 style={{ borderBottom: '1px solid var(--color-border-default)', paddingBottom: '8px' }}>Assessment Design Structure ({formatWeighting(totalWeighting)}% Total)</h3>
           {assessments.length === 0 ? (
             <p className="text-muted text-small">No assessments defined.</p>
           ) : (
@@ -100,10 +101,10 @@ export const OutputSummary: React.FC = () => {
                         <span className="badge">{a.type || 'Undefined'}</span>
                       </td>
                       <td style={{ verticalAlign: 'top' }}>
-                        <strong>{a.weighting}%</strong>
+                        <strong>{formatWeighting(a.weighting)}%</strong>
                       </td>
                       <td style={{ verticalAlign: 'top' }}>
-                        {a.linkedOutcomeIds.length === 0 ? '-' : (
+                        {!Array.isArray(a.linkedOutcomeIds) || a.linkedOutcomeIds.length === 0 ? '-' : (
                           <div className="flex flex-col gap-xs">
                             {a.linkedOutcomeIds.map(id => (
                               <span key={id} className="badge" style={{ backgroundColor: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0', alignSelf: 'flex-start' }}>

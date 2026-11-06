@@ -1,5 +1,6 @@
 import type { AppState, LearningOutcome, Assessment, AssessmentPlanMeta, Rationale, AssessmentType, AIUsageMode } from '../types';
 import { v4 as uuidv4 } from 'uuid';
+import { sanitizeWeightInput } from './weighting';
 
 export const emptyState: AppState = {
   meta: {
@@ -27,15 +28,11 @@ function isRecord(val: unknown): val is Record<string, unknown> {
 }
 
 /**
- * Safely coerces a weighting value to a number.
+ * Safely coerces and sanitizes a weighting value to a number.
  */
 export function normalizeWeighting(val: unknown): number {
-  if (typeof val === 'number') {
-    return isNaN(val) ? 0 : val;
-  }
-  if (typeof val === 'string') {
-    const parsed = Number(val);
-    return isNaN(parsed) ? 0 : parsed;
+  if (typeof val === 'number' || typeof val === 'string') {
+    return sanitizeWeightInput(val);
   }
   return 0;
 }
